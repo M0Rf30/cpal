@@ -153,15 +153,33 @@ impl Stream {
         D: FnMut(&mut Data, &OutputCallbackInfo) + Send + 'static,
         E: FnMut(StreamError) + Send + 'static,
     {
+        // Detect DoP streams (DSD over PCM) by sample rate
+        // DoP uses 176.4kHz (DSD64) or 352.8kHz (DSD128)
+        let sample_rate_hz = config.sample_rate.0;
+        let is_dop = matches!(sample_rate_hz, 176400 | 352800) &&
+                     matches!(sample_format, SampleFormat::I24 | SampleFormat::I32);
+
         // Create stream with properties
+        // For DoP streams, add properties to disable resampling and processing
+        let mut props = pipewire::properties::properties! {
+            *pipewire::keys::MEDIA_TYPE => "Audio",
+            *pipewire::keys::MEDIA_CATEGORY => "Playback",
+            *pipewire::keys::MEDIA_ROLE => "Music",
+        };
+
+        if is_dop {
+            // Add DoP-specific properties to prevent marker corruption
+            props.insert("node.rate", sample_rate_hz.to_string());
+            props.insert("resample.disable", "true".to_string());
+            props.insert("node.dont-remix", "true".to_string());
+            props.insert("stream.dont-remix", "true".to_string());
+            props.insert("node.want-driver", "true".to_string());
+        }
+
         let stream = pipewire::stream::StreamRc::new(
             context.core.clone(),
-            "cpal-output",
-            pipewire::properties::properties! {
-                *pipewire::keys::MEDIA_TYPE => "Audio",
-                *pipewire::keys::MEDIA_CATEGORY => "Playback",
-                *pipewire::keys::MEDIA_ROLE => "Music",
-            },
+            if is_dop { "cpal-dop-output" } else { "cpal-output" },
+            props,
         )
         .map_err(|e| BuildStreamError::BackendSpecific {
             err: BackendSpecificError {
