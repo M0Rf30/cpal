@@ -713,8 +713,23 @@ mod platform_impl {
         )))
     )]
     pub use crate::host::jack::Host as JackHost;
+    #[cfg(feature = "pipewire")]
+    #[cfg_attr(
+        docsrs,
+        doc(cfg(all(
+            any(
+                target_os = "linux",
+                target_os = "dragonfly",
+                target_os = "freebsd",
+                target_os = "netbsd"
+            ),
+            feature = "pipewire"
+        )))
+    )]
+    pub use crate::host::pipewire::Host as PipeWireHost;
 
     impl_platform_host!(
+        #[cfg(feature = "pipewire")] PipeWire => PipeWireHost,
         #[cfg(feature = "jack")] Jack => JackHost,
         Alsa => AlsaHost,
         #[cfg(feature = "custom")] Custom => super::CustomHost

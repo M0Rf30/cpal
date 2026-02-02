@@ -26,6 +26,13 @@ asio = [
 # Note: JACK must be installed separately on all platforms
 jack = ["dep:jack"]
 
+# PipeWire backend
+# Modern multimedia server providing low-latency audio with automatic format conversion
+# Requires: PipeWire daemon running on the system
+# Platform: Linux, DragonFly BSD, FreeBSD, NetBSD
+# Note: PipeWire is the default audio server on many modern Linux distributions
+pipewire = ["dep:pipewire"]
+
 # WebAssembly backend using wasm-bindgen
 # Enables the Web Audio API backend for browser-based audio
 # Required for any WebAssembly audio support
@@ -89,6 +96,7 @@ alsa = "0.11"
 libc = "0.2"
 audio_thread_priority = { version = "0.34", optional = true }
 jack = { version = "0.13", optional = true }
+pipewire = { version = "0.9", optional = true }
 
 [target.'cfg(target_vendor = "apple")'.dependencies]
 mach2 = "0.5"

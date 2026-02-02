@@ -31,7 +31,7 @@ This library currently supports the following:
 
 Currently, supported hosts include:
 
-- Linux (via ALSA or JACK)
+- Linux (via ALSA, PipeWire, or JACK)
 - Windows (via WASAPI by default, ASIO or JACK optionally)
 - macOS (via CoreAudio or JACK)
 - iOS (via CoreAudio)
@@ -73,6 +73,17 @@ Enables the JACK (JACK Audio Connection Kit) backend. JACK is an audio server pr
 **Usage:** See the [beep example](examples/beep.rs) for selecting the JACK host at runtime.
 
 **Note:** JACK is available as an alternative backend on all supported platforms. It provides an option for pro-audio users who need JACK's routing and inter-application audio connectivity. The native backends (ALSA for Linux/BSD, WASAPI/ASIO for Windows, CoreAudio for macOS) remain the default and recommended choice for most applications.
+
+### `pipewire`
+
+**Platform:** Linux, DragonFly BSD, FreeBSD, NetBSD
+
+Enables the PipeWire backend. PipeWire is a modern multimedia server providing low-latency audio with automatic format conversion.
+
+**Requirements:**
+- PipeWire daemon running on the system
+
+**Note:** PipeWire is available as an alternative to ALSA on Linux systems. It is the default audio server on many modern distributions (Ubuntu 22.04+, Fedora 34+).
 
 ### `wasm-bindgen`
 
